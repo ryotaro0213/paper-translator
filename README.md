@@ -1,8 +1,17 @@
 # Paper Translator
 
-英語論文 PDF を、**図と表のレイアウトを保持したまま**日本語訳する Claude Code プラグイン。
+英語論文 PDF を、**図と表のレイアウトを保持したまま**日本語訳するツール。**Claude Code** と **OpenAI Codex** の両方に対応。
 
 「ChatGPT で文字翻訳はできるけど、図と一緒に日本語で読みたい」というニーズに応えます。
+
+## 対応エージェント
+
+| エージェント | エントリポイント | インストール | ドキュメント |
+|---|---|---|---|
+| **Claude Code** | `/translate-paper <pdf>` スラッシュコマンド | `bash install.sh` | [commands/](commands/), [skills/](skills/) |
+| **OpenAI Codex** | 自然言語（`translate paper.pdf`）| `bash codex/install.sh` | [codex/README.md](codex/README.md) |
+
+Python パイプライン（`scripts/`）は両方で共通です。
 
 ## 何ができるか
 
@@ -51,40 +60,42 @@ brew install pandoc
 # macOS:   brew install --cask mactex
 ```
 
-### 2. プラグインをインストール
+### 2. エージェント別インストール
 
-#### 方法 A: Claude Code Plugin マーケット経由（将来）
-
-```
-/plugin install paper-translator
-```
-
-#### 方法 B: ローカルディレクトリ配置
+#### Claude Code
 
 ```bash
 git clone https://github.com/ryotaro0213/paper-translator.git \
   ~/.claude/plugins/paper-translator
 ```
 
-#### 方法 C: 手動コピー
-
-このリポジトリの `plugins/paper-translator/` を `~/.claude/plugins/` にコピーする。
-
-### 3. 使う
-
 Claude Code 内で:
-
 ```
 /translate-paper path/to/your-paper.pdf
 ```
 
-または自然言語で:
+詳細: [docs/installation.md](docs/installation.md)
 
-```
-この論文を翻訳して: ./papers/foo.pdf
+#### OpenAI Codex
+
+```bash
+git clone https://github.com/ryotaro0213/paper-translator.git ~/paper-translator
+bash ~/paper-translator/codex/install.sh        # インタラクティブ
+# または
+bash ~/paper-translator/codex/install.sh project   # プロジェクト単位
+bash ~/paper-translator/codex/install.sh global    # ユーザー全体
 ```
 
-完了後、閲覧方法を選択するダイアログが出ます（HTML / VSCode / PDF / 開かない）。
+Codex 起動後、自然言語で:
+```
+translate ./papers/foo.pdf
+```
+
+詳細: [codex/README.md](codex/README.md), [codex/docs/installation.md](codex/docs/installation.md)
+
+### 3. 完了後
+
+いずれのエージェントでも、閲覧方法を選択するダイアログが出ます（HTML / VSCode / PDF / 開かない）。
 
 ## ワークフロー
 
@@ -97,7 +108,7 @@ PDF 入力
   ↓
 [3] compose_figures.py — Figure/Table を原PDFから領域切り出し
   ↓
-[4] Claude 翻訳        — セクション単位で日本語訳
+[4] エージェント翻訳   — Claude Code または Codex がセクション単位で日本語訳
   ↓
 [5] validate_figures.py — C1–C10 で配置を自動検証
   ↓
@@ -123,14 +134,26 @@ PDF 入力
 
 ## ドキュメント
 
-- [使い方詳細](docs/usage.md)
-- [アーキテクチャ](docs/architecture.md)
-- [トラブルシューティング](docs/troubleshooting.md)
-- [インストール詳細](docs/installation.md)
+### 共通
+- [アーキテクチャ](docs/architecture.md) — パイプライン設計と拡張ポイント
+- [トラブルシューティング](docs/troubleshooting.md) — よくある問題と対処
+
+### Claude Code 版
+- [インストール](docs/installation.md)
+- [使い方](docs/usage.md)
+- [スラッシュコマンド定義](commands/translate-paper.md)
+- [スキル定義](skills/paper-translator/SKILL.md)
+
+### Codex 版
+- [Codex 概要](codex/README.md)
+- [インストール (Codex)](codex/docs/installation.md)
+- [使い方 (Codex)](codex/docs/usage.md)
+- [アーキテクチャ (Codex)](codex/docs/architecture.md)
+- [AGENTS.md](codex/AGENTS.md) — Codex が読み込む指示ファイル本体
 
 ## 動作要件
 
-- Claude Code (latest)
+- Claude Code (latest) または OpenAI Codex (latest)
 - Python 3.10+
 - PyMuPDF 1.24+
 - 任意: pandoc, LaTeX
