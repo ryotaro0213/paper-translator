@@ -11,14 +11,17 @@ When active, Codex will respond to prompts like:
 
 by running the pipeline described below.
 
-## Environment variables
+## Scripts location
 
-The scripts live under a known directory. One of the following must be set:
+The Python scripts are located relative to this AGENTS.md file:
 
-- `PAPER_TRANSLATOR_ROOT` — absolute path to the paper-translator checkout
-  (contains `scripts/`)
-- Fallback: if this file sits at `${PAPER_TRANSLATOR_ROOT}/codex/AGENTS.md`,
-  Codex can infer the root from the AGENTS.md path
+- If installed via `codex/install.sh`, the scripts are copied to
+  `./scripts/` in the current working directory.
+- If this file is inside the repository checkout, scripts are at
+  `../plugins/paper-translator/scripts/` relative to this file.
+
+**Use `$PAPER_TRANSLATOR_SCRIPTS`** (set by the install script) or
+fall back to `./scripts/` when the variable is not set.
 
 All shell commands must prefix Python calls with `PYTHONIOENCODING=utf-8`
 on Windows to avoid `cp932` encode errors.
@@ -68,7 +71,7 @@ cp "$PDF" "$OUT/original.pdf"
 ### Step 4 — Extract figures and text
 
 ```bash
-PYTHONIOENCODING=utf-8 python "$PAPER_TRANSLATOR_ROOT/scripts/extract.py" \
+PYTHONIOENCODING=utf-8 python "${PAPER_TRANSLATOR_SCRIPTS:-./scripts}/extract.py" \
   "$PDF" "$OUT"
 ```
 
@@ -92,8 +95,8 @@ Record the verdict in `review.md` later.
 ### Step 6 — Build figure plan and compose Figure/Table images
 
 ```bash
-PYTHONIOENCODING=utf-8 python "$PAPER_TRANSLATOR_ROOT/scripts/plan_figures.py" "$OUT"
-PYTHONIOENCODING=utf-8 python "$PAPER_TRANSLATOR_ROOT/scripts/compose_figures.py" "$OUT"
+PYTHONIOENCODING=utf-8 python "${PAPER_TRANSLATOR_SCRIPTS:-./scripts}/plan_figures.py" "$OUT"
+PYTHONIOENCODING=utf-8 python "${PAPER_TRANSLATOR_SCRIPTS:-./scripts}/compose_figures.py" "$OUT"
 ```
 
 Outputs:
@@ -134,7 +137,7 @@ Append to `<OUT>/translated.md`. Rules:
 ### Step 9 — Validate figure placement (blocking)
 
 ```bash
-PYTHONIOENCODING=utf-8 python "$PAPER_TRANSLATOR_ROOT/scripts/validate_figures.py" "$OUT"
+PYTHONIOENCODING=utf-8 python "${PAPER_TRANSLATOR_SCRIPTS:-./scripts}/validate_figures.py" "$OUT"
 ```
 
 Checks C1–C10 (coverage, order, caption match, duplication, sub-panel
@@ -168,7 +171,7 @@ Ask the user (via whatever UI mechanism Codex offers) to pick:
 Dispatch via:
 
 ```bash
-bash "$PAPER_TRANSLATOR_ROOT/scripts/view.sh" "$OUT" html     # vscode | pdf
+bash "${PAPER_TRANSLATOR_SCRIPTS:-./scripts}/view.sh" "$OUT" html     # vscode | pdf
 ```
 
 `view.sh` falls back to a Python HTML builder when pandoc is absent,
@@ -206,7 +209,5 @@ Summarize:
 
 ## Reference material
 
-- Architecture diagram: `../docs/architecture.md`
-- Troubleshooting: `../docs/troubleshooting.md`
-- Claude Code equivalent: `../commands/translate-paper.md`
-  (for cross-checking parity between the two flavours)
+- Architecture diagram: see `docs/architecture.md` in the repository
+- Troubleshooting: see `docs/troubleshooting.md` in the repository

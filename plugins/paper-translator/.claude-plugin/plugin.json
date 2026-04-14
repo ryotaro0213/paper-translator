@@ -1,0 +1,5 @@
+{
+  "name": "paper-translator",
+  "description": "英語論文PDFを図・表レイアウト保持のまま日本語訳。Python + PyMuPDFのみで動作。",
+  "version": "1.0.0"
+}

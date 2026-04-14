@@ -12,59 +12,61 @@ scripts as the Claude Code plugin; only the entry point differs.
 - Automatic placement validation (10 checks) before the HTML is built
 - Choice of viewer afterwards: HTML in browser / VSCode preview / PDF
 
-## 🎯 一番早い流れ（VS Code + Codex 拡張）
+## Quick Start
 
 ```bash
-# 1. リポジトリを好きな場所に取得（フォルダ名は任意）
+# 1. Clone the repo anywhere (folder name doesn't matter)
 git clone https://github.com/ryotaro0213/paper-translator.git
-# 例: カレントディレクトリに paper-translator/ が作られる
-# 別名で置きたい場合:
-#   git clone https://github.com/ryotaro0213/paper-translator.git my-tools/translator
 
-# 2. Python 依存を入れる（初回のみ）
+# 2. Install Python dependencies
 pip install pymupdf markdown pymdown-extensions
 
-# 3. 使いたいプロジェクトに AGENTS.md を配置
-cd ~/my-project/
-bash /path/to/wherever/you/cloned/codex/install.sh project
-#    ↑ clone 先の codex/install.sh を呼ぶだけでよい
+# 3. Go to your project folder (any name)
+mkdir my-papers && cd my-papers
+
+# 4. Install — copies AGENTS.md + scripts/ into current folder
+bash /path/to/paper-translator/codex/install.sh project
 ```
 
-あとは **VS Code でこのプロジェクトを開き**、Codex 拡張のチャットで:
+Open this folder in VS Code, and tell Codex:
 
 ```
 translate ./papers/sample.pdf
 ```
 
-と言うだけ。`AGENTS.md` に**絶対パスが直接書き込まれている**ので、環境変数の設定は不要です。
+That's it. Scripts are copied locally as `./scripts/`, so **no environment
+variables or folder-name dependencies**.
 
-> ℹ️ **Clone 先フォルダ名は自由です**。`install.sh` は自分自身の場所から相対的にパスを解決するので、どこに clone しても正しく AGENTS.md が生成されます。
->
-> ℹ️ Codex CLI 派の人も手順は同じ。`codex` コマンドをプロジェクトディレクトリで起動してください。
+> The clone location and folder name are arbitrary. `install.sh` copies
+> everything needed into your working directory.
 
-Codex は以下を自動で行います:
+## Install modes
 
-1. PDF を読み取り、slug 候補を提示 → 確認
-2. 図・テキストを抽出し、配置を計画
-3. Figure / Table を原 PDF から領域切り出しして合成
-4. セクション単位で翻訳を `.paper-translator/outputs/<slug>/translated.md` に追記
-5. 配置検証（10 項目）
-6. HTML 生成 → 選んだ方法で閲覧
-
-## インストールモード
-
-| モード | AGENTS.md の場所 | 有効範囲 | VS Code 拡張との相性 |
+| Mode | What gets installed | Scope | VS Code compatibility |
 |---|---|---|---|
-| **project** ⭐ 推奨 | プロジェクト直下 | そのプロジェクトだけ | ◎ |
-| **global** | `~/.codex/` | 全プロジェクト | △ |
+| **project** (recommended) | `AGENTS.md` + `scripts/` in current dir | This project only | Best |
+| **global** | Files in `~/.codex/` + config.toml entry | All projects | OK |
 
-迷ったら `project` を選んでください。詳細: [docs/installation.md](docs/installation.md)
+```bash
+bash /path/to/paper-translator/codex/install.sh project   # recommended
+bash /path/to/paper-translator/codex/install.sh global     # advanced
+bash /path/to/paper-translator/codex/install.sh            # interactive
+```
 
-## Directory layout once installed
+## Directory layout once installed (project mode)
 
 ```
-your-project/
-├── AGENTS.md                           # (copied here in 'project' mode)
+your-project/                           # any folder name
+├── AGENTS.md                           # Codex instructions
+├── scripts/                            # copied pipeline scripts
+│   ├── extract.py
+│   ├── plan_figures.py
+│   ├── compose_figures.py
+│   ├── validate_figures.py
+│   ├── to_html.py
+│   ├── view.sh
+│   └── paper.css
+├── .paper-translator.env               # optional env snippet
 ├── .paper-translator/
 │   └── outputs/
 │       └── <slug>/
@@ -79,28 +81,14 @@ your-project/
 │               ├── table-NN.png
 │               ├── fig-NN.png          # individual panels (fallback)
 │               └── page-NNN.png        # per-page renders
-└── …your own files
+└── ...your own files
 ```
-
-The scripts themselves stay in `$PAPER_TRANSLATOR_ROOT/scripts/` and are
-shared between the Claude Code and Codex editions.
-
-## Environment variables
-
-| Variable                | Purpose                                      |
-| ----------------------- | -------------------------------------------- |
-| `PAPER_TRANSLATOR_ROOT` | absolute path to the paper-translator root   |
-| `PYTHONIOENCODING`      | must be `utf-8` on Windows to avoid cp932    |
-
-`install.sh` writes a small `.env` snippet and prints export instructions.
 
 ## Documentation
 
-- [docs/installation.md](docs/installation.md) — full installation paths
-- [docs/usage.md](docs/usage.md) — command examples, part-only translation,
-  re-runs, custom terminology
+- [docs/installation.md](docs/installation.md) — full installation guide
+- [docs/usage.md](docs/usage.md) — command examples, partial translation, re-runs
 - [docs/architecture.md](docs/architecture.md) — pipeline overview
-  (shared with the Claude Code edition)
 - [../docs/troubleshooting.md](../docs/troubleshooting.md) — common issues
 - [AGENTS.md](AGENTS.md) — the actual instruction file Codex reads
 
@@ -108,13 +96,12 @@ shared between the Claude Code and Codex editions.
 
 Both editions run the same Python pipeline. Differences:
 
-| Aspect             | Claude Code                        | Codex                                  |
-| ------------------ | ---------------------------------- | -------------------------------------- |
-| Entry point        | `/translate-paper <pdf>` slash command | natural language trigger via AGENTS.md |
-| Plugin manifest    | `.claude-plugin/plugin.json`       | `AGENTS.md` in project or global config |
-| Installation       | `~/.claude/plugins/`               | copy AGENTS.md + set env var           |
-| User prompts       | `AskUserQuestion` tool             | Codex's native question mechanism      |
-| Script location    | `${CLAUDE_PLUGIN_ROOT}/scripts/`   | `$PAPER_TRANSLATOR_ROOT/scripts/`      |
+| Aspect             | Claude Code                             | Codex                                  |
+| ------------------ | --------------------------------------- | -------------------------------------- |
+| Entry point        | `/translate-paper <pdf>` slash command  | natural language via AGENTS.md         |
+| Installation       | `/plugin marketplace add` or manual     | `bash codex/install.sh project`        |
+| Script location    | `${CLAUDE_PLUGIN_ROOT}/scripts/`        | `./scripts/` (copied locally)          |
+| User prompts       | `AskUserQuestion` tool                  | Codex's native question mechanism      |
 
 Output format, validation logic, and figure-capture strategy are identical.
 

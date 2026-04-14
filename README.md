@@ -8,10 +8,10 @@
 
 | エージェント | エントリポイント | インストール | ドキュメント |
 |---|---|---|---|
-| **Claude Code** | `/translate-paper <pdf>` スラッシュコマンド | `bash install.sh` | [commands/](commands/), [skills/](skills/) |
+| **Claude Code** | `/translate-paper <pdf>` スラッシュコマンド | `/plugin marketplace add` | [plugins/](plugins/paper-translator/) |
 | **OpenAI Codex** | 自然言語（`translate paper.pdf`）| `bash codex/install.sh` | [codex/README.md](codex/README.md) |
 
-Python パイプライン（`scripts/`）は両方で共通です。
+Python パイプライン（`plugins/paper-translator/scripts/`）は両方で共通です。
 
 ## 何ができるか
 
@@ -62,28 +62,40 @@ brew install pandoc
 
 ### 2. エージェント別インストール
 
-#### Claude Code
+#### Claude Code（推奨: Plugin Marketplace）
 
-```bash
-git clone https://github.com/ryotaro0213/paper-translator.git \
-  ~/.claude/plugins/paper-translator
+Claude Code 内で以下を実行するだけ:
+
+```
+/plugin marketplace add ryotaro0213/paper-translator
+/plugin install paper-translator@paper-translator
 ```
 
-Claude Code 内で:
+インストール後:
 ```
 /translate-paper path/to/your-paper.pdf
 ```
+
+> **手動インストール**（Marketplace が使えない場合）:
+> ```bash
+> git clone https://github.com/ryotaro0213/paper-translator.git
+> cd paper-translator
+> bash install.sh
+> ```
 
 詳細: [docs/installation.md](docs/installation.md)
 
 #### OpenAI Codex
 
+任意のフォルダを作成して開き、インストーラを実行:
+
 ```bash
+# リポジトリをクローン（場所は任意）
 git clone https://github.com/ryotaro0213/paper-translator.git ~/paper-translator
-bash ~/paper-translator/codex/install.sh        # インタラクティブ
-# または
-bash ~/paper-translator/codex/install.sh project   # プロジェクト単位
-bash ~/paper-translator/codex/install.sh global    # ユーザー全体
+
+# 作業フォルダでインストール（フォルダ名は何でもOK）
+mkdir my-papers && cd my-papers
+bash ~/paper-translator/codex/install.sh project
 ```
 
 Codex 起動後、自然言語で:
@@ -141,8 +153,8 @@ PDF 入力
 ### Claude Code 版
 - [インストール](docs/installation.md)
 - [使い方](docs/usage.md)
-- [スラッシュコマンド定義](commands/translate-paper.md)
-- [スキル定義](skills/paper-translator/SKILL.md)
+- [スラッシュコマンド定義](plugins/paper-translator/commands/translate-paper.md)
+- [スキル定義](plugins/paper-translator/skills/paper-translator/SKILL.md)
 
 ### Codex 版
 - [Codex 概要](codex/README.md)

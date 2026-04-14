@@ -25,16 +25,16 @@
 
 | モジュール | 言語 | 役割 |
 |---|---|---|
-| `commands/translate-paper.md` | Markdown (Claude 命令) | 全体オーケストレーション |
-| `skills/paper-translator/SKILL.md` | Markdown (Claude 命令) | 自然言語トリガと方針 |
-| `scripts/extract.py` | Python | PyMuPDF で PDF→図・テキスト・ページ画像 |
-| `scripts/plan_figures.py` | Python | bbox から reading-order を計算、anchor_text 付与 |
-| `scripts/compose_figures.py` | Python | 各 Figure/Table を原PDFページから領域切り出し |
-| `scripts/apply_composed.py` | Python | 個別パネル参照を合成画像参照に集約 |
-| `scripts/validate_figures.py` | Python | C1–C10 の配置検証 |
-| `scripts/to_html.py` | Python | 単一HTML 生成（pandoc フォールバック） |
-| `scripts/view.sh` | Bash | 閲覧方法ディスパッチ |
-| `scripts/paper.css` | CSS | HTML スタイル |
+| `plugins/paper-translator/commands/translate-paper.md` | Markdown (Claude 命令) | 全体オーケストレーション |
+| `plugins/paper-translator/skills/paper-translator/SKILL.md` | Markdown (Claude 命令) | 自然言語トリガと方針 |
+| `plugins/paper-translator/scripts/extract.py` | Python | PyMuPDF で PDF→図・テキスト・ページ画像 |
+| `plugins/paper-translator/scripts/plan_figures.py` | Python | bbox から reading-order を計算、anchor_text 付与 |
+| `plugins/paper-translator/scripts/compose_figures.py` | Python | 各 Figure/Table を原PDFページから領域切り出し |
+| `plugins/paper-translator/scripts/apply_composed.py` | Python | 個別パネル参照を合成画像参照に集約 |
+| `plugins/paper-translator/scripts/validate_figures.py` | Python | C1–C10 の配置検証 |
+| `plugins/paper-translator/scripts/to_html.py` | Python | 単一HTML 生成（pandoc フォールバック） |
+| `plugins/paper-translator/scripts/view.sh` | Bash | 閲覧方法ディスパッチ |
+| `plugins/paper-translator/scripts/paper.css` | CSS | HTML スタイル |
 
 ## 設計の核心
 
@@ -129,7 +129,7 @@
 ## 拡張ポイント
 
 ### 別言語への翻訳
-`skills/paper-translator/SKILL.md` の翻訳ルールを別言語向けに書き換える。スクリプト側は言語非依存。
+`plugins/paper-translator/skills/paper-translator/SKILL.md` の翻訳ルールを別言語向けに書き換える。スクリプト側は言語非依存。
 
 ### OCR 対応（スキャン PDF）
 `extract.py` に `pytesseract` を組み込む。
