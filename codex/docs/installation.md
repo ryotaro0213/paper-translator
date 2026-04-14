@@ -3,14 +3,14 @@
 ## Quick Start（VS Code + Codex 拡張ユーザー向け）
 
 ```bash
-# 1. リポジトリを好きな場所に clone（フォルダ名は自由）
+# 1. 作業フォルダを作成して移動（フォルダ名は何でもOK）
+mkdir my-papers && cd my-papers
+
+# 2. リポジトリをクローン
 git clone https://github.com/ryotaro0213/paper-translator.git
 
-# 2. 使いたいプロジェクトフォルダに移動（フォルダ名は何でもOK）
-cd ~/my-project/
-
 # 3. AGENTS.md + scripts/ をプロジェクトにインストール
-bash /path/to/paper-translator/codex/install.sh project
+bash paper-translator/codex/install.sh project
 
 # 4. Python の依存（初回のみ）
 pip install pymupdf markdown pymdown-extensions
@@ -60,8 +60,8 @@ translate ./papers/foo.pdf
 ### project モード（推奨）
 
 ```bash
-cd ~/my-project
-bash <CLONE_PATH>/codex/install.sh project
+cd my-project
+bash paper-translator/codex/install.sh project
 ```
 
 何が起こるか:

@@ -15,17 +15,17 @@ scripts as the Claude Code plugin; only the entry point differs.
 ## Quick Start
 
 ```bash
-# 1. Clone the repo anywhere (folder name doesn't matter)
-git clone https://github.com/ryotaro0213/paper-translator.git
-
-# 2. Install Python dependencies
-pip install pymupdf markdown pymdown-extensions
-
-# 3. Go to your project folder (any name)
+# 1. Create a project folder and move into it (any name)
 mkdir my-papers && cd my-papers
 
+# 2. Clone the repo into the project folder
+git clone https://github.com/ryotaro0213/paper-translator.git
+
+# 3. Install Python dependencies
+pip install pymupdf markdown pymdown-extensions
+
 # 4. Install — copies AGENTS.md + scripts/ into current folder
-bash /path/to/paper-translator/codex/install.sh project
+bash paper-translator/codex/install.sh project
 ```
 
 Open this folder in VS Code, and tell Codex:

@@ -90,12 +90,14 @@ Claude Code 内で以下を実行するだけ:
 任意のフォルダを作成して開き、インストーラを実行:
 
 ```bash
-# リポジトリをクローン（場所は任意）
-git clone https://github.com/ryotaro0213/paper-translator.git ~/paper-translator
-
-# 作業フォルダでインストール（フォルダ名は何でもOK）
+# 1. 作業フォルダを作成して移動（フォルダ名は何でもOK）
 mkdir my-papers && cd my-papers
-bash ~/paper-translator/codex/install.sh project
+
+# 2. リポジトリをクローン（作業フォルダ内にクローンされる）
+git clone https://github.com/ryotaro0213/paper-translator.git
+
+# 3. インストール（AGENTS.md + scripts/ が作業フォルダ直下にコピーされる）
+bash paper-translator/codex/install.sh project
 ```
 
 Codex 起動後、自然言語で:
