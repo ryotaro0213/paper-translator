@@ -12,55 +12,53 @@ scripts as the Claude Code plugin; only the entry point differs.
 - Automatic placement validation (10 checks) before the HTML is built
 - Choice of viewer afterwards: HTML in browser / VSCode preview / PDF
 
-## Quick start
-
-### 1. Install Python dependencies
+## 🎯 一番早い流れ（VS Code + Codex 拡張）
 
 ```bash
+# 1. リポジトリを好きな場所に取得（フォルダ名は任意）
+git clone https://github.com/ryotaro0213/paper-translator.git
+# 例: カレントディレクトリに paper-translator/ が作られる
+# 別名で置きたい場合:
+#   git clone https://github.com/ryotaro0213/paper-translator.git my-tools/translator
+
+# 2. Python 依存を入れる（初回のみ）
 pip install pymupdf markdown pymdown-extensions
+
+# 3. 使いたいプロジェクトに AGENTS.md を配置
+cd ~/my-project/
+bash /path/to/wherever/you/cloned/codex/install.sh project
+#    ↑ clone 先の codex/install.sh を呼ぶだけでよい
 ```
 
-Optional (higher-quality HTML/PDF output):
-
-```bash
-# Windows
-winget install pandoc
-# macOS
-brew install pandoc
-# For PDF output, also install LaTeX (MiKTeX / TeX Live / MacTeX)
-```
-
-### 2. Install the paper-translator files
-
-```bash
-git clone https://github.com/ryotaro0213/paper-translator.git ~/paper-translator
-cd ~/paper-translator/codex
-bash install.sh           # copy AGENTS.md to current project + set PAPER_TRANSLATOR_ROOT
-```
-
-`install.sh` takes two modes:
-
-- `bash install.sh project`  — copy `AGENTS.md` into the current project
-- `bash install.sh global`   — append `AGENTS.md` path to `~/.codex/config.toml`
-
-Without arguments it asks interactively.
-
-### 3. Use it
-
-Start Codex in your project directory and say:
+あとは **VS Code でこのプロジェクトを開き**、Codex 拡張のチャットで:
 
 ```
 translate ./papers/sample.pdf
 ```
 
-Codex will:
+と言うだけ。`AGENTS.md` に**絶対パスが直接書き込まれている**ので、環境変数の設定は不要です。
 
-1. Inspect the PDF, propose a slug, ask for confirmation
-2. Extract figures / text, plan the layout, compose per-Figure images
-3. Translate section by section into `.paper-translator/outputs/<slug>/translated.md`
-4. Run the placement validator
-5. Build the final HTML
-6. Open it the way you asked
+> ℹ️ **Clone 先フォルダ名は自由です**。`install.sh` は自分自身の場所から相対的にパスを解決するので、どこに clone しても正しく AGENTS.md が生成されます。
+>
+> ℹ️ Codex CLI 派の人も手順は同じ。`codex` コマンドをプロジェクトディレクトリで起動してください。
+
+Codex は以下を自動で行います:
+
+1. PDF を読み取り、slug 候補を提示 → 確認
+2. 図・テキストを抽出し、配置を計画
+3. Figure / Table を原 PDF から領域切り出しして合成
+4. セクション単位で翻訳を `.paper-translator/outputs/<slug>/translated.md` に追記
+5. 配置検証（10 項目）
+6. HTML 生成 → 選んだ方法で閲覧
+
+## インストールモード
+
+| モード | AGENTS.md の場所 | 有効範囲 | VS Code 拡張との相性 |
+|---|---|---|---|
+| **project** ⭐ 推奨 | プロジェクト直下 | そのプロジェクトだけ | ◎ |
+| **global** | `~/.codex/` | 全プロジェクト | △ |
+
+迷ったら `project` を選んでください。詳細: [docs/installation.md](docs/installation.md)
 
 ## Directory layout once installed
 
