@@ -41,7 +41,7 @@ bash install.sh
 
 ### OpenAI Codex
 
-```bash
+```powershell
 # 1. Python パッケージをインストール
 pip install pymupdf markdown pymdown-extensions
 
@@ -53,10 +53,11 @@ cd my-papers
 git clone https://github.com/ryotaro0213/paper-translator.git
 
 # 4. インストール（AGENTS.md と scripts/ が作業フォルダ直下にコピーされる）
+#    ※ Git Bash が必要（Git for Windows に付属）
 bash paper-translator/codex/install.sh project
 
 # 5. クローンしたリポジトリは不要なので削除してOK
-rm -rf paper-translator
+Remove-Item -Recurse -Force paper-translator
 ```
 
 VS Code でフォルダを開き、Codex に:
