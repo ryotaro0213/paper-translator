@@ -1,0 +1,30 @@
+{
+  "name": "paper-translator",
+  "version": "1.0.0",
+  "description": "Translate English research-paper PDFs into Japanese while preserving the exact original layout of figures and tables. Works fully offline; only requires Python + PyMuPDF.",
+  "author": {
+    "name": "Ryotaro Nozawa",
+    "url": "https://github.com/ryotaro0213"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/ryotaro0213/paper-translator",
+  "keywords": [
+    "translation",
+    "pdf",
+    "research-paper",
+    "japanese",
+    "academic",
+    "claude-code-plugin"
+  ],
+  "commands": ["./commands"],
+  "skills": ["./skills"],
+  "requirements": {
+    "python": ">=3.10",
+    "python_packages": [
+      "pymupdf>=1.24",
+      "markdown>=3.5",
+      "pymdown-extensions>=10"
+    ],
+    "optional_tools": ["pandoc", "lualatex"]
+  }
+}
