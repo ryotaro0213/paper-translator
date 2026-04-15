@@ -134,7 +134,56 @@ Append to `<OUT>/translated.md`. Rules:
   by the composed images only.
 - References list: leave as English; preserve `[N]` citations in the body.
 
+### Step 8.5 — Normalize figure placement (MANDATORY before validation)
+
+After drafting or updating `translated.md`, always run the two steps
+below in order. Do not skip them, and do not run the validator first.
+
+```bash
+PYTHONIOENCODING=utf-8 python "${PAPER_TRANSLATOR_SCRIPTS:-./scripts}/apply_composed.py" "$OUT"
+PYTHONIOENCODING=utf-8 python "${PAPER_TRANSLATOR_SCRIPTS:-./scripts}/append_missing_composed_figures.py" "$OUT"
+```
+
+What `apply_composed.py` does:
+
+- Strips any previously inserted composed `figure-NN.png` / `table-NN.png`
+  lines and the auto-generated fallback section, so the placement is
+  recomputed from scratch — running it twice yields an identical file.
+- Collapses any consecutive per-panel `fig-NN.png` lines that belong to
+  the same captioned Figure into a single composed reference.
+- For each composed figure, locates the first `図 N` / `Figure N` in the
+  body and inserts the image at the end of that paragraph.
+- Figures with no textual reference are appended under a clearly marked
+  `## 図版一覧（自動補完）` section so the validator still sees full
+  coverage.
+- If `$OUT/figure_placement.json` exists, uses its per-figure
+  `after_heading` pins in preference to the textual-reference search.
+
+What `append_missing_composed_figures.py` does:
+
+- Safety net: scans `translated.md` for `figures/figure-NN.png` and
+  `figures/table-NN.png` references and appends any still-missing ones
+  to the fallback section. Defends against manual edits that
+  accidentally deleted a composed reference after `apply_composed.py`
+  was last run.
+
+### figure_placement.json (optional manual pin)
+
+To pin a specific figure to a heading, create a JSON like:
+
+```json
+{
+  "3": {"after_heading": "## 3.2 Method"},
+  "7": {"after_heading": "### Experimental setup"}
+}
+```
+
+`apply_composed.py` will insert the composed image right after the
+matching heading line, overriding the textual-reference heuristic.
+
 ### Step 9 — Validate figure placement (blocking)
+
+Run the validator only after Step 8.5 has completed successfully:
 
 ```bash
 PYTHONIOENCODING=utf-8 python "${PAPER_TRANSLATOR_SCRIPTS:-./scripts}/validate_figures.py" "$OUT"
@@ -146,8 +195,9 @@ sub-panel order). Exit codes:
 
 - `0` → clean, proceed
 - `1` → warnings only; show them and ask the user whether to continue
-- `2` → errors; fix `translated.md` and re-run. For unclear cases, read
-  the relevant `page-NNN.png` with the image-read tool to cross-check.
+- `2` → errors; fix `translated.md` and re-run **from Step 8.5**.
+  For unclear cases, read the relevant `page-NNN.png` with the
+  image-read tool to cross-check.
 
 ### Step 10 — Review log
 

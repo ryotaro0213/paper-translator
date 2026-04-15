@@ -90,7 +90,43 @@ PYTHONIOENCODING=utf-8 python "${CLAUDE_PLUGIN_ROOT}/scripts/compose_figures.py"
   を 1 行で挿入。**個別パネル `fig-NN.png` は使わない**（合成画像の方がレイアウトを保持する）
 - **References セクション**: 原則として未訳。本文中の `[N]` 引用は保持
 
+## ステップ 7.5: 図配置を正規化（必須・検証前に必ず実行）
+
+翻訳が一段落したら、検証の**前に**必ず以下を実行する:
+
+```bash
+PYTHONIOENCODING=utf-8 python "${CLAUDE_PLUGIN_ROOT}/scripts/apply_composed.py" "$OUT"
+PYTHONIOENCODING=utf-8 python "${CLAUDE_PLUGIN_ROOT}/scripts/append_missing_composed_figures.py" "$OUT"
+```
+
+`apply_composed.py` の役割:
+- 既存の composed 画像参照を一度除去してから再配置（冪等・再実行で同結果）
+- 残存する個別パネル (`fig-NN.png`) の連続ブロックを合成画像 (`figure-NN.png`) 1 行に集約
+- 本文中で `図 N` / `Figure N` が最初に現れる段落の直後に、対応する合成画像を挿入
+- 本文に参照が無い図は `## 図版一覧（自動補完）` セクションへ末尾にまとめて配置
+- `$OUT/figure_placement.json` が存在すれば、そこで指定された見出し直後への明示ピン留めを優先
+
+`append_missing_composed_figures.py` は安全網:
+- `apply_composed.py` 実行後に translated.md を走査し
+- `figures/figure-NN.png` / `figures/table-NN.png` のうち本文にまだ登場しないものを検出
+- 欠落があれば `## 図版一覧（自動補完）` セクションへ追記（重複なし）
+
+### 手動ピン留め (`figure_placement.json`, 任意)
+
+明示的に「Figure 3 は `## 3.2 手法` 直後に置く」と固定したい場合:
+
+```json
+{
+  "3": {"after_heading": "## 3.2 手法"},
+  "7": {"after_heading": "### 実験結果"}
+}
+```
+
+このファイルが `$OUT/figure_placement.json` にあれば、`apply_composed.py` は本文参照よりもそちらを優先する。
+
 ## ステップ 8: 図配置の自動検証（必須・ブロッキング）
+
+ステップ 7.5 の実行後にのみ、この検証を走らせる:
 
 ```bash
 PYTHONIOENCODING=utf-8 python "${CLAUDE_PLUGIN_ROOT}/scripts/validate_figures.py" "$OUT"
@@ -104,19 +140,11 @@ PYTHONIOENCODING=utf-8 python "${CLAUDE_PLUGIN_ROOT}/scripts/validate_figures.py
 終了コード:
 - `0` クリーン → 次へ
 - `1` 警告のみ → 警告内容を提示し続行可否を `AskUserQuestion`
-- `2` エラー → translated.md を修正して再実行
+- `2` エラー → translated.md を修正してステップ 7.5 から再実行
 
 修正時、疑わしい箇所は `figures/page-NNN.png`（全ページレンダー）を `Read` で視覚確認する。
 
-## ステップ 9: 個別パネル参照を合成画像参照に集約（任意）
-
-翻訳時から `figure-NN.png` を使えていれば不要。万が一個別パネル参照が混ざっていたら:
-
-```bash
-PYTHONIOENCODING=utf-8 python "${CLAUDE_PLUGIN_ROOT}/scripts/apply_composed.py" "$OUT"
-```
-
-## ステップ 10: 検証ログ作成
+## ステップ 9: 検証ログ作成
 
 `$OUT/review.md` に以下を記録:
 - 翻訳済みセクション一覧
@@ -124,7 +152,7 @@ PYTHONIOENCODING=utf-8 python "${CLAUDE_PLUGIN_ROOT}/scripts/apply_composed.py" 
 - 数値・固有名詞の保持確認
 - 残課題
 
-## ステップ 11: 閲覧方法の選択
+## ステップ 10: 閲覧方法の選択
 
 `AskUserQuestion` で選ばせる:
 
@@ -144,7 +172,7 @@ bash "${CLAUDE_PLUGIN_ROOT}/scripts/view.sh" "$OUT" html      # or vscode | pdf
 - PDF: pandoc + lualatex → 無ければ HTML 経由を案内
 - VSCode: `code` コマンドで開く
 
-## ステップ 12: 完了報告
+## ステップ 11: 完了報告
 
 - 出力フォルダのパス
 - 翻訳セクション数 / 図数 / 表数
