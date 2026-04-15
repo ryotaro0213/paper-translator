@@ -65,8 +65,11 @@ txt = (out_dir / "extracted_text.md").read_text(encoding="utf-8")
 idx_by_file = {e["file"]: e for e in idx}
 
 
+FIG_RE = re.compile(r"\b(?:Fig(?:ure)?\.?)\s+(\d+)\b", re.IGNORECASE)
+
+
 def extract_fig_num(caption_hint: str):
-    m = re.search(r"Figure\s+(\d+)", caption_hint or "")
+    m = FIG_RE.search(caption_hint or "")
     return int(m.group(1)) if m else None
 
 

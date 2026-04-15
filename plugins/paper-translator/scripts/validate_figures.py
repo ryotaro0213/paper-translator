@@ -61,7 +61,7 @@ FIGREF_RE = re.compile(r"(?:図|Figure)\s*(\d+)")
 
 
 def extract_fig_num_local(caption_hint: str):
-    m = re.search(r"Figure\s+(\d+)", caption_hint or "")
+    m = re.search(r"\b(?:Fig(?:ure)?\.?)\s+(\d+)\b", caption_hint or "", re.IGNORECASE)
     return int(m.group(1)) if m else None
 
 embeds = []

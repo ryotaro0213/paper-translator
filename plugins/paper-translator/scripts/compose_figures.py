@@ -14,9 +14,20 @@ import sys, json, re, pathlib
 import fitz
 
 
+FIG_OR_TABLE_RE_TEMPLATE = r"^(?:{kind}|{kind_abbrev}\.?)\s+{num}\."
+
+
 def find_caption_bbox(page, figure_num, kind="Figure"):
-    """Locate the 'Figure N.' / 'Table N.' caption text block; return bbox or None."""
-    pat = re.compile(rf"^{kind}\s+{figure_num}\.")
+    """Locate the 'Figure N.' / 'Fig. N.' / 'Table N.' caption text block; return bbox or None."""
+    kind_abbrev = "Fig" if kind == "Figure" else kind
+    pat = re.compile(
+        FIG_OR_TABLE_RE_TEMPLATE.format(
+            kind=re.escape(kind),
+            kind_abbrev=re.escape(kind_abbrev),
+            num=figure_num,
+        ),
+        re.IGNORECASE,
+    )
     for b in page.get_text("blocks"):
         x0, y0, x1, y1, txt = b[0], b[1], b[2], b[3], b[4]
         first_line = txt.strip().splitlines()[0] if txt.strip() else ""
